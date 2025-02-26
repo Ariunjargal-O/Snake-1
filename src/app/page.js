@@ -1,20 +1,39 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { useInterval } from "usehooks-ts";
 import { useEventListener } from "usehooks-ts";
-const size = 10;
+const size = 15;
 
 const board = {
-  width: 50,
-  height: 50,
+  width: 20,
+  height: 20,
 };
 
 export default function Home() {
   const [head, setHead] = useState({
-    top: 0,
-    left: 0,
+    top: 5,
+    left: 4,
   });
   const [direction, setDirection] = useState("right");
+  const [tails, setTails] = useState([
+    {
+      top: 5,
+      left: 1,
+    },
+    {
+      top: 5,
+      left: 2,
+    },
+    {
+      top: 5,
+      left: 3,
+    },
+  ]);
+  const [food, setFood] = useState({
+    top: 4,
+    left: 5,
+  });
+const [score, setScore] = useState(0)
 
   useEffect(() => {
     document.addEventListener("keydown", (e) => {
@@ -45,6 +64,13 @@ export default function Home() {
   function gameLoop() {
     let newLeft = head.left;
     let newTop = head.top;
+
+    const newTails = [...tails];
+    
+    newTails.push(head);
+    newTails.shift();
+    setTails(newTails);
+
     switch (direction) {
       case "right": {
         newLeft = head.left + 1;
@@ -75,34 +101,93 @@ export default function Home() {
         break;
       }
     }
+
     setHead({ top: newTop, left: newLeft });
+
+    if (head.top === food.top && head.left === food.left) {
+      newTails.push(head);
+      setTails(newTails);
+      generateNewFood();
+    }
+
+    if (tails.find((tail) => tail.left === newLeft && tail.top === newTop)) {
+      alert("GAMEOVER");
+      location.reload();
+      lo;
+    }
+  }
+
+  function generateNewFood() {
+    const newFoodTop = getRandomInt(board.height);
+    const newFoodLeft = getRandomInt(board.width);
+    setFood({ top: newFoodTop, left: newFoodLeft });
+  }
+
+  function getRandomInt(max) {
+    return Math.floor(Math.random() * max);
   }
 
   useInterval(() => {
     gameLoop();
-  }, 80);
+  }, 100);
 
   return (
     <div>
       <header className="text-center mt-10 text-[50px]">
         Welcome to Snake
       </header>
-      <div >
-      <div
-        style={{ width: board.width * size, height: board.height * size }}
-        className="bg-pink-300 relative mx-auto mt-20 border-black"
-      >
+      <div>
+      <h1 className="text-center mt-10 text-[35px] mb-20">SCORE: </h1>
+      {}
+      </div>
+      <div>
+        <div 
+       style={{ width: board.width * size + size, height: board.height * size + size }}
+        className="border-4 border-black border-double flex justify-center items-center mx-auto">
         <div
-          style={{
-            width: size,
-            height: size,
-            top: head.top * size,
-            left: head.left * size,
-          }}
-          className="bg-stone-900 absolute rounded-full "
-        ></div>
+          style={{ width: board.width * size, height: board.height * size }}
+          className="bg-violet-100 relative  "
+        >
+          <div
+            style={{
+              width: size,
+              height: size,
+              top: food.top * size,
+              left: food.left * size,
+            }}
+            className="bg-red-600 absolute rounded-full "
+          ></div>
+          <div
+            style={{
+              width: size,
+              height: size,
+              top: head.top * size,
+              left: head.left * size,
+            }}
+            className="bg-green-700 absolute flex rounded-sm "
+          >
+            <div className="flex gap-1">
+              <div className="flex justify-center gap-1 flex-col ml-[2px] ">
+                <div className="w-1 h-1 bg-black rounded-full"></div>
+                <div className="w-1 h-1 bg-black rounded-full"></div>
+              </div>
+            </div>
+          </div>
+          {tails.map((tail, index) => (
+            <div
+              key={`${tail.left}-${tail.top}-${index}`}
+              style={{
+                width: size,
+                height: size,
+                top: tail.top * size,
+                left: tail.left * size,
+              }}
+              className="bg-green-500 absolute "
+            ></div>
+          ))}
+        </div>
       </div>
-      </div>
+        </div>
 
       <div className="flex gap-5 mt-10 justify-center">
         <button
