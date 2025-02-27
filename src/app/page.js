@@ -1,5 +1,5 @@
 "use client";
-import { useActionState, useEffect, useState } from "react";
+import { use, useActionState, useEffect, useState } from "react";
 import { useInterval } from "usehooks-ts";
 import { useEventListener } from "usehooks-ts";
 const size = 15;
@@ -33,40 +33,69 @@ export default function Home() {
     top: 4,
     left: 5,
   });
-const [score, setScore] = useState(0)
+  const [score, setScore] = useState(0);
+  const [gameOver, setGameOver] = useState(false);
+  const [displayButton, setDisplayButton] = useState(false);
+
+  // useEffect(() => {
+  //   document.addEventListener("keydown", (e) => {
+  //     if (e.code === "Arrowup") {
+  //       setDirection("up");
+  //     }
+  //     switch (e.code) {
+  //       case "ArrowUp": {
+  //         setDirection("up");
+  //         break;
+  //       }
+  //       case "ArrowDown": {
+  //         setDirection("down");
+  //         break;
+  //       }
+  //       case "ArrowLeft": {
+  //         setDirection("left");
+  //         break;
+  //       }
+  //       case "ArrowRight": {
+  //         setDirection("right");
+  //         break;
+  //       }
+  //     }
+  //   });
+  // });
 
   useEffect(() => {
-    document.addEventListener("keydown", (e) => {
+    const handleKeyDown = (e) => {
       if (e.code === "Arrowup") {
         setDirection("up");
       }
       switch (e.code) {
-        case "ArrowUp": {
-          setDirection("up");
+        case "ArrowUp":
+          if (direction !== "down") setDirection("up");
           break;
-        }
-        case "ArrowDown": {
-          setDirection("down");
+        case "ArrowDown":
+          if (direction !== "up") setDirection("down");
           break;
-        }
-        case "ArrowLeft": {
-          setDirection("left");
+        case "ArrowLeft":
+          if (direction !== "right") setDirection("left");
           break;
-        }
-        case "ArrowRight": {
-          setDirection("right");
+        case "ArrowRight":
+          if (direction !== "left") setDirection("right");
           break;
-        }
+        default:
+          break;
       }
-    });
-  });
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [direction]);
 
   function gameLoop() {
     let newLeft = head.left;
     let newTop = head.top;
 
     const newTails = [...tails];
-    
+
     newTails.push(head);
     newTails.shift();
     setTails(newTails);
@@ -108,13 +137,12 @@ const [score, setScore] = useState(0)
       newTails.push(head);
       setTails(newTails);
       generateNewFood();
+      setScore((prevScore) => prevScore + 1);
     }
 
     if (tails.find((tail) => tail.left === newLeft && tail.top === newTop)) {
-      alert("GAMEOVER");
-      location.reload();
-      lo;
-    }
+      setGameOver(true);
+    } 
   }
 
   function generateNewFood() {
@@ -131,90 +159,162 @@ const [score, setScore] = useState(0)
     gameLoop();
   }, 100);
 
+  function restartGame() {
+    setHead({ top: 5, left: 4 });
+    setDirection("right");
+    setTails([
+      { top: 5, left: 1 },
+      { top: 5, left: 2 },
+      { top: 5, left: 3 },
+    ]);
+    setFood({ top: 4, left: 5 });
+    setGameOver(false);
+    setScore(0); // Reset score
+  }
+
+  // function displayButton() {
+  //   return (
+  //     <div className="flex gap-5 mt-10 justify-center">
+  //       <button
+  //         onClick={() => setDirection("left")}
+  //         className="bg-blue-100 rounded-sm py-2 px-8"
+  //       >
+  //         Left
+  //       </button>
+  //       <button
+  //         onClick={() => setDirection("up")}
+  //         className="bg-blue-100 rounded-sm py-2 px-8"
+  //       >
+  //         Up
+  //       </button>
+  //       <button
+  //         onClick={() => setDirection("down")}
+  //         className="bg-blue-100 rounded-sm py-2 px-8"
+  //       >
+  //         Down
+  //       </button>
+  //       <button
+  //         onClick={() => setDirection("right")}
+  //         className="bg-blue-100 rounded-sm py-2 px-8"
+  //       >
+  //         Right
+  //       </button>
+  //     </div>
+  //   );
+  // }
+
   return (
     <div>
       <header className="text-center mt-10 text-[50px]">
         Welcome to Snake
       </header>
       <div>
-      <h1 className="text-center mt-10 text-[35px] mb-20">SCORE: </h1>
-      {}
+        <h1 className="text-center mt-10 text-[20px] mb-20">
+          SCORE: <span className="font-bold text-[25px]">{score}</span>
+        </h1>
+        {}
       </div>
       <div>
-        <div 
-       style={{ width: board.width * size + size, height: board.height * size + size }}
-        className="border-4 border-black border-double flex justify-center items-center mx-auto">
         <div
-          style={{ width: board.width * size, height: board.height * size }}
-          className="bg-violet-100 relative  "
+          style={{
+            width: board.width * size + size,
+            height: board.height * size + size,
+          }}
+          className="border-4 border-black border-double flex justify-center items-center mx-auto"
         >
           <div
-            style={{
-              width: size,
-              height: size,
-              top: food.top * size,
-              left: food.left * size,
-            }}
-            className="bg-red-600 absolute rounded-full "
-          ></div>
-          <div
-            style={{
-              width: size,
-              height: size,
-              top: head.top * size,
-              left: head.left * size,
-            }}
-            className="bg-green-700 absolute flex rounded-sm "
+            style={{ width: board.width * size, height: board.height * size }}
+            className="bg-violet-100 relative  "
           >
-            <div className="flex gap-1">
-              <div className="flex justify-center gap-1 flex-col ml-[2px] ">
-                <div className="w-1 h-1 bg-black rounded-full"></div>
-                <div className="w-1 h-1 bg-black rounded-full"></div>
-              </div>
-            </div>
-          </div>
-          {tails.map((tail, index) => (
             <div
-              key={`${tail.left}-${tail.top}-${index}`}
               style={{
                 width: size,
                 height: size,
-                top: tail.top * size,
-                left: tail.left * size,
+                top: food.top * size,
+                left: food.left * size,
               }}
-              className="bg-green-500 absolute "
+              className="bg-red-600 absolute rounded-full "
             ></div>
-          ))}
+            <div
+              style={{
+                width: size,
+                height: size,
+                top: head.top * size,
+                left: head.left * size,
+              }}
+              className="bg-green-700 absolute flex rounded-sm "
+            >
+              <div className="flex gap-1">
+                <div className="flex justify-center gap-1 flex-col ml-[2px] ">
+                  <div className="w-1 h-1 bg-black rounded-full"></div>
+                  <div className="w-1 h-1 bg-black rounded-full"></div>
+                </div>
+              </div>
+            </div>
+            {tails.map((tail, index) => (
+              <div
+                key={`${tail.left}-${tail.top}-${index}`}
+                style={{
+                  width: size,
+                  height: size,
+                  top: tail.top * size,
+                  left: tail.left * size,
+                }}
+                className="bg-green-500 absolute "
+              ></div>
+            ))}
+          </div>
         </div>
       </div>
-        </div>
 
-      <div className="flex gap-5 mt-10 justify-center">
+      <div className="flex gap-6 justify-center mt-10">
         <button
-          onClick={() => setDirection("left")}
-          className="bg-blue-100 rounded-sm py-2 px-8"
+          onClick={
+            displayButton && (
+              <div className="flex gap-5 mt-10 justify-center">
+                <button
+                  onClick={() => setDirection("left")}
+                  className="bg-blue-100 rounded-sm py-2 px-8"
+                >
+                  Left
+                </button>
+                <button
+                  onClick={() => setDirection("up")}
+                  className="bg-blue-100 rounded-sm py-2 px-8"
+                >
+                  Up
+                </button>
+                <button
+                  onClick={() => setDirection("down")}
+                  className="bg-blue-100 rounded-sm py-2 px-8"
+                >
+                  Down
+                </button>
+                <button
+                  onClick={() => setDirection("right")}
+                  className="bg-blue-100 rounded-sm py-2 px-8"
+                >
+                  Right
+                </button>
+              </div>
+            )
+          }
+          className="bg-blue-300 rounded-sm py-2 px-8 flex justify-self-center mt-4"
         >
-          Left
-        </button>
-        <button
-          onClick={() => setDirection("up")}
-          className="bg-blue-100 rounded-sm py-2 px-8"
-        >
-          Up
-        </button>
-        <button
-          onClick={() => setDirection("down")}
-          className="bg-blue-100 rounded-sm py-2 px-8"
-        >
-          Down
-        </button>
-        <button
-          onClick={() => setDirection("right")}
-          className="bg-blue-100 rounded-sm py-2 px-8"
-        >
-          Right
+          Display Button
         </button>
       </div>
+      {gameOver && (
+        <div className="mt-8 text-center">
+          <p className="text-2xl font-bold text-red-600">GAME OVER!</p>
+          <button
+            onClick={restartGame}
+            className="bg-red-200 rounded-sm py-2 px-8 mt-4 text-red-700"
+          >
+            Restart
+          </button>
+        </div>
+      )}
     </div>
   );
 }
