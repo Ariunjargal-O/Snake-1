@@ -36,6 +36,7 @@ export default function Home() {
   const [score, setScore] = useState(0);
   const [gameOver, setGameOver] = useState(false);
   const [displayButton, setDisplayButton] = useState(false);
+  const [speed, setSpeed] = useState(100)
 
   // useEffect(() => {
   //   document.addEventListener("keydown", (e) => {
@@ -142,7 +143,8 @@ export default function Home() {
 
     if (tails.find((tail) => tail.left === newLeft && tail.top === newTop)) {
       setGameOver(true);
-    } 
+      setSpeed(null)
+    }
   }
 
   function generateNewFood() {
@@ -157,7 +159,7 @@ export default function Home() {
 
   useInterval(() => {
     gameLoop();
-  }, 100);
+  }, speed);
 
   function restartGame() {
     setHead({ top: 5, left: 4 });
@@ -169,6 +171,7 @@ export default function Home() {
     ]);
     setFood({ top: 4, left: 5 });
     setGameOver(false);
+    setSpeed(100)
     setScore(0); // Reset score
   }
 
@@ -270,8 +273,14 @@ export default function Home() {
       <div className="flex gap-6 justify-center mt-10">
         <button
           onClick={
-            displayButton && (
-              <div className="flex gap-5 mt-10 justify-center">
+            () => setDisplayButton(!displayButton)
+          }
+          className="bg-blue-300 rounded-sm py-2 px-8 flex justify-self-center mt-4"
+        >
+          Display Button
+        </button>
+      </div>
+      {displayButton && <div className="flex gap-5 mt-10 justify-center">
                 <button
                   onClick={() => setDirection("left")}
                   className="bg-blue-100 rounded-sm py-2 px-8"
@@ -296,14 +305,8 @@ export default function Home() {
                 >
                   Right
                 </button>
-              </div>
-            )
-          }
-          className="bg-blue-300 rounded-sm py-2 px-8 flex justify-self-center mt-4"
-        >
-          Display Button
-        </button>
-      </div>
+              </div>}
+      
       {gameOver && (
         <div className="mt-8 text-center">
           <p className="text-2xl font-bold text-red-600">GAME OVER!</p>
