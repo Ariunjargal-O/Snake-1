@@ -37,6 +37,7 @@ export default function Home() {
   const [gameOver, setGameOver] = useState(false);
   const [displayButton, setDisplayButton] = useState(false);
   const [speed, setSpeed] = useState(100);
+  const [highscore, setHighScore] = useState(0)
 
   // useEffect(() => {
   //   document.addEventListener("keydown", (e) => {
@@ -63,6 +64,12 @@ export default function Home() {
   //     }
   //   });
   // });
+useEffect(() => {
+  if(score > highscore){
+    setHighScore(score);
+    localStorage.setItem("snakeHighScore", score.toString())
+  }
+},[score])
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -175,36 +182,10 @@ export default function Home() {
     setScore(0); // Reset score
   }
 
-  // function displayButton() {
-  //   return (
-  //     <div className="flex gap-5 mt-10 justify-center">
-  //       <button
-  //         onClick={() => setDirection("left")}
-  //         className="bg-blue-100 rounded-sm py-2 px-8"
-  //       >
-  //         Left
-  //       </button>
-  //       <button
-  //         onClick={() => setDirection("up")}
-  //         className="bg-blue-100 rounded-sm py-2 px-8"
-  //       >
-  //         Up
-  //       </button>
-  //       <button
-  //         onClick={() => setDirection("down")}
-  //         className="bg-blue-100 rounded-sm py-2 px-8"
-  //       >
-  //         Down
-  //       </button>
-  //       <button
-  //         onClick={() => setDirection("right")}
-  //         className="bg-blue-100 rounded-sm py-2 px-8"
-  //       >
-  //         Right
-  //       </button>
-  //     </div>
-  //   );
-  // }
+  function resetHighScore() {
+    localStorage.removeItem("snakeHighScore");
+    setHighScore(score);
+  }
 
   return (
     <div>
@@ -225,7 +206,10 @@ export default function Home() {
       )}
 
       <div>
-        <h1 className="text-center mt-4 text-[20px] mb-3">
+      <h1 className="text-center mt-4 text-[30px] font-bold text-red-700 ">
+          HIGHSCORE: <span className="font-bold text-[30px] text-red-900">{highscore}</span>
+        </h1>
+        <h1 className="text-center mt-2 text-[20px] mb-3">
           SCORE: <span className="font-bold text-[25px]">{score}</span>
         </h1>
         {}
@@ -309,7 +293,7 @@ export default function Home() {
             </button>
             <button
               onClick={() => setDirection("right")}
-              className="bg-blue-100 rounded-sm py-2 px-8"
+              className="bg-blue-100 rounded-sm py-2 px-7"
             >
               Right
             </button>
