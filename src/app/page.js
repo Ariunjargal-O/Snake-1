@@ -37,7 +37,7 @@ export default function Home() {
   const [gameOver, setGameOver] = useState(false);
   const [displayButton, setDisplayButton] = useState(false);
   const [speed, setSpeed] = useState(100);
-  const [highscore, setHighScore] = useState(0)
+  const [highscore, setHighScore] = useState(0);
 
   // useEffect(() => {
   //   document.addEventListener("keydown", (e) => {
@@ -64,12 +64,12 @@ export default function Home() {
   //     }
   //   });
   // });
-useEffect(() => {
-  if(score > highscore){
-    setHighScore(score);
-    localStorage.setItem("snakeHighScore", score.toString())
-  }
-},[score])
+  useEffect(() => {
+    if (score > highscore) {
+      setHighScore(score);
+      localStorage.setItem("snakeHighScore", score.toString());
+    }
+  }, [score]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -190,8 +190,16 @@ useEffect(() => {
   return (
     <div>
       <header className="text-center mt-10 text-[50px]">
-        Welcome to Snake
+        Welcome to Snake 🐍
       </header>
+      <div className="text-center">
+        <a
+          href="https://github.com/Ariunjargal-O"
+          className="text-[20px] text-blue-700"
+        >
+          🔗Made by Arii 
+        </a>
+      </div>
 
       {gameOver && (
         <div className="mt-3 text-center">
@@ -206,8 +214,11 @@ useEffect(() => {
       )}
 
       <div>
-      <h1 className="text-center mt-4 text-[30px] font-bold text-red-700 ">
-          HIGHSCORE: <span className="font-bold text-[30px] text-red-900">{highscore}</span>
+        <h1 className="text-center mt-4 text-[30px] font-bold text-red-700 ">
+          HIGHSCORE:{" "}
+          <span className="font-bold text-[30px] text-red-900">
+            {highscore}
+          </span>
         </h1>
         <h1 className="text-center mt-2 text-[20px] mb-3">
           SCORE: <span className="font-bold text-[25px]">{score}</span>
